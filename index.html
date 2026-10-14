@@ -830,3 +830,34 @@
   </script>
 </body>
 </html>
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Admin Editor</title></head>
+<body>
+  <h1>Admin Editor</h1>
+  <textarea id="editor" style="width:100%;height:300px"></textarea>
+  <br>
+  <button id="save">Save & Broadcast</button>
+
+  <script>
+  async function save() {
+    const html = document.getElementById('editor').value;
+    const token = prompt('Enter admin token:');
+    const res = await fetch('/admin/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ html })
+    });
+    const j = await res.json();
+    alert(j.ok ? 'Saved' : ('Error: ' + (j.error || res.status)));
+  }
+  document.getElementById('save').onclick = save;
+
+  // Optional: fetch current content on load
+  (async ()=>{
+    const r = await fetch('/content.html'); 
+    if(r.ok) document.getElementById('editor').value = await r.text();
+  })();
+  </script>
+</body>
+</html>
