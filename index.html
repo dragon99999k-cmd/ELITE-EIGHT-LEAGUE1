@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ELITE EIGHT LEAGUE — V6</title>
+  <style>
+    :root{
+      --bg:#08090c;
+      --panel:#111319;
+      --gold:#d8b45a;
+      --gold2:#f3dc96;
+      --text:#f5f3ed;
+      --muted:#a5a7b0;
+      --line:#2c3039;
+      --accent:#5ee1ff;
+      --tap:48px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:radial-gradient(ellipse at 50% -10%, #302613 0, transparent 42%), var(--bg);
+      color:var(--text);
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+      -webkit-font-smoothing:antialiased;
+      -webkit-tap-highlight-color:transparent;
+    }
+    a{text-decoration:none;color:inherit}
+    button,input{font:inherit}
+    button{cursor:pointer;touch-action:manipulation}
+    .wrap{max-width:1200px;margin:0 auto;padding:18px}
+    .btn{
+      border:1px solid var(--gold);
+      background:linear-gradient(135deg,#f4dc96,#b78b2c);
+      color:#171208;
+      border-radius:8px;
+      font-weight:800;
+      min-height:var(--tap);
+      padding:8px 12px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+    .btn.ghost{
+      background:transparent;
+      color:var(--text);
+      border-color:rgba(255,255,255,.12);
+    }
+    .small{padding:6px 8px;font-size:13px}
+    .full{width:100%}
+
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:12px 0;
+      border-bottom:1px solid #ffffff12;
+      position:relative;
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .mark{
+      width:46px;height:46px;display:grid;place-items:center;
+      border:1px solid var(--gold);color:var(--gold);font-weight:900;border-radius:10px;
+    }
+    .nav{
+      display:flex;align-items:center;gap:14px;color:var(--muted);font-size:13px;
+    }
+    .nav a{padding:8px 6px;border-radius:8px}
+    .nav a:hover{color:var(--gold2)}
+    #menuToggle{display:none}
+    .menu-icon{display:inline-block;width:22px;height:16px;position:relative}
+    .menu-icon::before,.menu-icon::after,.menu-icon span{
+      content:"";position:absolute;left:0;right:0;height:2px;background:var(--text);border-radius:2px;
+    }
+    .menu-icon::before{top:0}
+    .menu-icon span{top:7px}
+    .menu-icon::after{bottom:0}
+
+    .hero{
+      display:grid;grid-template-columns:1.2fr .8fr;gap:20px;align-items:center;
+      padding:28px 0 18px;position:relative;
+    }
+    .hero h1{
+      font-size:clamp(36px,6vw,72px);line-height:.96;margin:8px 0;
+    }
+    .eyebrow{
+      font-size:11px;letter-spacing:3px;color:var(--gold);font-weight:800;
+    }
+    .small-muted{color:var(--muted);line-height:1.7}
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .stats{display:flex;gap:20px;margin-top:18px;flex-wrap:wrap}
+    .stat strong{display:block;font-size:18px}
+    .stat small{color:var(--muted);font-size:11px}
+
+    .cup-scene{
+      position:relative;width:min(320px,82vw);height:300px;margin:auto;
+      display:grid;place-items:center;filter:drop-shadow(0 18px 24px rgba(0,0,0,.5));
+    }
+    .cup-scene::before{
+      content:"";position:absolute;inset:10% 10% 8%;border-radius:50%;
+      background:radial-gradient(circle, rgba(216,180,90,.18), transparent 62%);
+      filter:blur(16px);z-index:0;
+    }
+    .trophy{
+      width:min(240px,80%);z-index:2;animation:tFloat 4.2s ease-in-out infinite;
+    }
+    @keyframes tFloat{
+      0%,100%{transform:translateY(0) rotate(0deg)}
+      50%{transform:translateY(-12px) rotate(3deg)}
+    }
+    .orb,.ring,.spark{position:absolute}
+    .orb{
+      border-radius:50%;border:1px solid rgba(216,180,90,.25);filter:blur(9px);
+      animation:orbPulse 5s ease-in-out infinite;
+    }
+    .orb-1{width:220px;height:220px;top:18px;left:20px;background:radial-gradient(circle, rgba(216,180,90,.10), transparent 60%)}
+    .orb-2{width:170px;height:170px;top:44px;left:58px;background:radial-gradient(circle, rgba(216,180,90,.08), transparent 58%);animation-delay:.6s}
+    .orb-3{width:120px;height:120px;top:58px;right:26px;background:radial-gradient(circle, rgba(255,225,135,.12), transparent 55%);animation-delay:1.4s}
+    @keyframes orbPulse{
+      0%,100%{transform:scale(1);opacity:.35}
+      50%{transform:scale(1.08);opacity:.8}
+    }
+    .ring{
+      border-radius:50%;border:1px solid rgba(216,180,90,.28);
+      animation:ringRotate 9s linear infinite;
+    }
+    .ring-1{width:250px;height:250px;top:10px;left:18px}
+    .ring-2{width:190px;height:190px;top:42px;left:46px;animation-direction:reverse;animation-duration:12s}
+    @keyframes ringRotate{
+      0%{transform:rotate(0deg) scale(1)}
+      50%{transform:rotate(180deg) scale(1.03)}
+      100%{transform:rotate(360deg) scale(1)}
+    }
+    .spark{
+      width:10px;height:10px;border-radius:50%;
+      background:radial-gradient(circle,#fff9d6 0%,#d8b45a 45%,rgba(216,180,90,0) 70%);
+      box-shadow:0 0 18px rgba(255,235,155,.8);
+      animation:sparkle 3.2s ease-in-out infinite;
+    }
+    .spark-1{top:28px;left:58px;animation-delay:.1s}
+    .spark-2{top:50px;right:52px;animation-delay:1s}
+    .spark-3{bottom:34px;left:74px;animation-delay:1.7s}
+    .spark-4{bottom:24px;right:70px;animation-delay:2.2s}
+    @keyframes sparkle{
+      0%,100%{transform:scale(.6);opacity:.5}
+      50%{transform:scale(1.35);opacity:1}
+    }
+
+    .section{margin-top:20px}
+    .section-head{
+      display:flex;justify-content:space-between;align-items:end;gap:12px;margin:18px 0 12px;
+    }
+    .section-head h2{margin:4px 0 0;font-size:28px}
+    .section-head small{letter-spacing:2px;color:var(--gold);font-weight:800}
+
+    .team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .team-card,.panel{
+      background:linear-gradient(145deg,#151820,#0e1015);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:14px;
+    }
+    .team-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .badge{
+      width:64px;height:64px;border-radius:50%;display:grid;place-items:center;
+      background:#090a0d;border:1px dashed #79663a;color:var(--gold);font-weight:900;overflow:hidden;
+    }
+    .badge img{width:100%;height:100%;object-fit:contain}
+    .upload{
+      display:inline-block;margin-top:8px;color:var(--gold2);cursor:pointer;
+      padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.04);
+      font-weight:700;
+    }
+    .upload input{display:none}
+
+    .match-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .match{
+      display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;
+      padding:12px;border-radius:10px;border:1px solid #252933;background:#0a0c10;
+    }
+    .club{display:flex;align-items:center;gap:8px;min-width:0}
+    .club.away{flex-direction:row-reverse;text-align:right}
+    .club-name{font-size:12px;font-weight:800}
+    .mini-badge{
+      width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+      font-size:10px;font-weight:900;background:#090a0d;border:1px solid #5d4e2b;color:var(--gold);overflow:hidden;
+    }
+    .mini-badge img{width:100%;height:100%;object-fit:contain}
+    .score{display:flex;align-items:center;gap:6px}
+    .score input{
+      width:54px;height:40px;text-align:center;border:1px solid #424650;border-radius:8px;
+      background:#171a21;color:var(--text);font-weight:900;font-size:15px;
+    }
+    .score input[disabled]{opacity:.6}
+    .status{font-size:10px;color:var(--muted);text-align:center;margin-top:6px}
+    .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    table{width:100%;border-collapse:collapse;min-width:640px}
+    th,td{padding:10px;border-bottom:1px solid #252933;text-align:center;font-size:13px}
+    th{color:var(--gold2);background:#ffffff04}
+    td:first-child,th:first-child{text-align:left}
+    .rank{color:var(--gold);font-weight:900}
+    .pill{
+      border:1px solid rgba(216,180,90,.25);color:var(--gold2);
+      padding:6px 10px;border-radius:999px;font-size:12px;
+    }
+
+    .champion-box{
+      display:flex;flex-direction:column;align-items:center;text-align:center;
+      padding:24px 18px;border:1px solid rgba(216,180,90,.35);
+      background:radial-gradient(circle at center, rgba(216,180,90,.08), rgba(18,20,24,.8) 45%, rgba(8,9,12,1) 100%);
+    }
+    .champion-cup{
+      font-size:58px;line-height:1;filter:drop-shadow(0 8px 18px rgba(216,180,90,.35));margin-bottom:8px;
+    }
+    #championName{margin:10px 0 6px;font-size:clamp(24px,3vw,36px)}
+    #championMeta{font-size:14px}
+    .champion-row{
+      background:linear-gradient(90deg, rgba(216,180,90,.08), rgba(255,255,255,0.02));
+      border-left:3px solid rgba(216,180,90,.8);
+    }
+    .hidden{display:none !important}
+
+    .admin-dash{
+      position:fixed;right:0;top:0;height:100vh;width:420px;
+      background:linear-gradient(180deg,#0d1013,#050607);
+      box-shadow:-20px 0 60px rgba(0,0,0,.7);
+      z-index:200;transform:translateX(110%);
+      transition:transform .32s ease;padding:18px;overflow:auto;
+      border-left:1px solid #1a1d22;
+    }
+    .admin-dash.open{transform:translateX(0)}
+    .admin-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .admin-panel{
+      background:linear-gradient(180deg,#101215,#090a0b);
+      border:1px solid #1e2127;border-radius:10px;padding:12px;margin-top:12px;
+    }
+    input[type="password"],input[type="text"]{
+      width:100%;padding:10px 12px;border-radius:8px;background:#090b0d;color:var(--text);
+      border:1px solid #232a31;font-size:16px;
+    }
+    .stack{display:flex;flex-direction:column;gap:8px}
+    .small-stack{display:flex;gap:8px;flex-wrap:wrap}
+    .badge-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    .badge-list .row{
+      display:flex;justify-content:space-between;align-items:center;
+      border-bottom:1px solid #1d2228;padding:8px 0;color:var(--muted);
+    }
+
+    @media (max-width:900px){
+      .hero{grid-template-columns:1fr}
+      .team-grid{grid-template-columns:repeat(2,1fr)}
+      .match-list{grid-template-columns:1fr}
+      .admin-dash{width:min(92vw,420px)}
+      .score input{width:62px;height:42px;font-size:16px}
+    }
+
+    @media (max-width:600px){
+      #menuToggle{display:inline-flex}
+      .nav{
+        display:none;position:absolute;top:68px;right:18px;flex-direction:column;
+        background:#0a0c10;padding:10px;border-radius:10px;border:1px solid var(--line);
+        gap:8px;min-width:160px;z-index:220;
+      }
+      .nav.mobile-open{display:flex}
+      .wrap{padding:14px}
+      .team-grid{grid-template-columns:repeat(2,1fr)}
+      .match-list{grid-template-columns:1fr}
+      .upload{padding:12px 14px;width:100%;text-align:center}
+      .btn{min-height:44px}
+      .panel{padding:12px}
+      .admin-dash{
+        top:auto;bottom:0;left:0;right:0;width:100vw;height:92vh;border-radius:12px 12px 0 0;
+        transform:translateY(110%);transition:transform .28s ease;
+      }
+      .admin-dash.open{transform:translateY(0)}
+      table,th,td{font-size:12px}
+      table{min-width:unset}
+    }
+
+    @media (max-width:420px){
+      .wrap{padding:12px}
+      .team-grid{grid-template-columns:1fr}
+      .score input{width:72px;height:44px;font-size:16px}
+      .badge{width:56px;height:56px}
+      .mini-badge{width:28px;height:28px}
+    }
+
+    :focus{outline:3px solid rgba(243,220,150,.12);outline-offset:2px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="mark">Ⅷ</div>
+        <div>
+          <strong>ELITE EIGHT</strong>
+          <div style="font-size:11px;color:var(--gold);letter-spacing:2px">FOOTBALL LEAGUE</div>
+        </div>
+      </div>
+
+      <button id="menuToggle" class="btn ghost small" aria-expanded="false" aria-controls="mainNav" title="Menu" type="button">
+        <span class="menu-icon"><span></span></span>
+      </button>
+
+      <nav id="mainNav" class="nav" aria-label="Main navigation">
+        <a href="#teams">Teams</a>
+        <a href="#fixtures">Fixtures</a>
+        <a href="#table">Standings</a>
+      </nav>
+
+      <button id="openAdmin" class="btn ghost small" type="button">Admin</button>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <div class="eyebrow">FOOTBALL · PASSION · GLORY</div>
+          <h1>ELITE EIGHT <span style="color:var(--gold2);display:block">LEAGUE</span></h1>
+          <p class="small-muted">Admin-only access. No public edits. Use the admin dashboard to manage badges, scores, exports, and the admin password.</p>
+          <div class="hero-actions">
+            <a href="#fixtures" class="btn full">VIEW FIXTURES ↘</a>
+          </div>
+          <div class="stats">
+            <div class="stat"><strong>08</strong><small>TEAMS</small></div>
+            <div class="stat"><strong>07</strong><small>MATCHDAYS</small></div>
+            <div class="stat"><strong>28</strong><small>MATCHES</small></div>
+          </div>
+        </div>
+
+        <div class="cup-scene" aria-hidden="true">
+          <div class="orb orb-1"></div>
+          <div class="orb orb-2"></div>
+          <div class="orb orb-3"></div>
+          <div class="ring ring-1"></div>
+          <div class="ring ring-2"></div>
+
+          <svg class="trophy" viewBox="0 0 220 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="cupGold" x1="45" y1="20" x2="176" y2="200" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#F4DC96"/><stop offset=".45" stop-color="#B78B2C"/><stop offset=".7" stop-color="#211B0E"/><stop offset="1" stop-color="#D8B45A"/>
+              </linearGradient>
+            </defs>
+            <path d="M68 22H152L145 95C142 125 127 143 110 153C93 143 78 125 75 95L68 22Z" fill="url(#cupGold)" stroke="#F3DC96" stroke-width="2"/>
+            <path d="M70 36H150M76 65H144M83 96H137" stroke="#77551B" stroke-width="2"/>
+            <path d="M70 37H39C34 74 52 99 79 105M150 37H181C186 74 168 99 141 105" stroke="#D8B45A" stroke-width="8"/>
+            <path d="M91 151H129L137 183H83L91 151Z" fill="url(#cupGold)" stroke="#F3DC96" stroke-width="2"/>
+            <path d="M72 183H148V197H72Z" fill="#B58A2D" stroke="#F3DC96" stroke-width="2"/>
+            <path d="M55 198H165V213H55Z" fill="url(#cupGold)" stroke="#F3DC96" stroke-width="2"/>
+            <path d="M44 214H176V229H44Z" fill="#8D6825" stroke="#F3DC96" stroke-width="2"/>
+            <path d="M110 0L116 13L130 14L120 23L123 36L110 29L97 36L100 23L90 14L104 13L110 0Z" fill="#F3DC96"/>
+            <circle cx="110" cy="83" r="18" stroke="#F3DC96" stroke-width="2"/>
+            <path d="M110 65L118 75L114 88L103 92L101 78L110 65Z" fill="#17140D" stroke="#F3DC96" stroke-width="1.5"/>
+          </svg>
+
+          <div class="spark spark-1"></div>
+          <div class="spark spark-2"></div>
+          <div class="spark spark-3"></div>
+          <div class="spark spark-4"></div>
+        </div>
+      </section>
+
+      <section id="teams" class="section">
+        <div class="section-head">
+          <div>
+            <small>THE CONTENDERS</small>
+            <h2>Meet the Teams</h2>
+          </div>
+          <button id="clearBadges" class="btn ghost small" type="button">Clear badges</button>
+        </div>
+        <div class="team-grid" id="teamGrid"></div>
+      </section>
+
+      <section id="fixtures" class="section">
+        <div class="section-head">
+          <div>
+            <small>THE ROAD TO GLORY</small>
+            <h2>Fixtures & Results</h2>
+          </div>
+          <button id="resetScores" class="btn ghost small" type="button">Reset all scores</button>
+        </div>
+
+        <div class="panel">
+          <div id="roundTabs" style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap" role="tablist"></div>
+          <div id="matches" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section id="table" class="section">
+        <div class="section-head">
+          <div>
+            <small>THE RACE</small>
+            <h2>League Standings</h2>
+          </div>
+          <div class="pill">3 PTS WIN • 1 PTS DRAW</div>
+        </div>
+        <div class="panel table-wrap">
+          <table>
+            <thead>
+              <tr><th>POS</th><th>TEAM</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>PTS</th></tr>
+            </thead>
+            <tbody id="standings"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="champion" class="section hidden" aria-hidden="true">
+        <div class="section-head">
+          <div>
+            <small>THE CROWN</small>
+            <h2>Champion</h2>
+          </div>
+        </div>
+
+        <div class="panel champion-box">
+          <div class="champion-cup">🏆</div>
+          <h3 id="championName">-</h3>
+          <div id="championMeta" class="small-muted">League winner</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <aside id="adminDash" class="admin-dash" aria-label="Admin dashboard" aria-hidden="true">
+    <div class="admin-head">
+      <h3>Admin Dashboard</h3>
+      <button id="closeDash" class="btn ghost small" type="button">Close</button>
+    </div>
+
+    <div id="statusText" class="small-muted">Not logged in</div>
+
+    <div id="loginPanel" class="admin-panel">
+      <div class="stack">
+        <input id="loginInput" type="password" placeholder="Admin password" autocomplete="current-password">
+        <button id="loginBtn" class="btn" type="button">Login</button>
+      </div>
+    </div>
+
+    <div id="managePanel" class="admin-panel hidden">
+      <strong>Season Tools</strong>
+      <div class="stack" style="margin-top:10px">
+        <button id="exportJson" class="btn" type="button">Export JSON</button>
+        <label class="btn ghost" style="display:inline-flex;cursor:pointer;">
+          Import JSON
+          <input id="importJson" type="file" accept="application/json" style="display:none">
+        </label>
+        <button id="exportCsv" class="btn" type="button">Export CSV</button>
+        <button id="resetAll" class="btn ghost" type="button">Reset all data</button>
+      </div>
+
+      <div style="margin-top:16px">
+        <strong>Badges</strong>
+        <div id="badgeList" class="badge-list"></div>
+      </div>
+
+      <div style="margin-top:16px">
+        <strong>Change Password</strong>
+        <div class="stack" style="margin-top:10px">
+          <input id="currentPw" type="password" placeholder="Current password" autocomplete="current-password">
+          <input id="newPw" type="password" placeholder="New password" autocomplete="new-password">
+          <div class="small-stack">
+            <button id="changePwBtn" class="btn" type="button">Change</button>
+            <button id="logoutBtn" class="btn ghost" type="button">Logout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    /* Utilities and safe DOM helpers */
+    const $ = sel => document.querySelector(sel);
+    const $all = sel => Array.from(document.querySelectorAll(sel));
+    function safeAddListener(el, evt, fn){ if(el) el.addEventListener(evt, fn); }
+    function load(k, fallback){ try{ return JSON.parse(localStorage.getItem(k)) ?? fallback }catch{ return fallback } }
+    function saveState(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
+
+    /* Config */
+    const teams = [
+      {name:"AFLATOON FC", short:"AF"},
+      {name:"3MORY FC", short:"3M"},
+      {name:"BAHAA FC", short:"BH"},
+      {name:"AMIR FC", short:"AM"},
+      {name:"ADAM FC", short:"AD"},
+      {name:"3MORY OSAMA FC", short:"3O"},
+      {name:"TRADER FC", short:"TR"},
+      {name:"ALTAIER FC", short:"AL"}
+    ];
+    const KEYS = {
+      SCORES:"elite8_scores_v6",
+      BADGES:"elite8_badges_v6",
+      ADMIN:"elite8_admin_v6",
+      SESSION:"elite8_session_v6"
+    };
+    let scores = load(KEYS.SCORES, {});
+    let badges = load(KEYS.BADGES, {});
+    let activeRound = 0;
+
+    /* Fixtures generator */
+    function makeFixtures(){
+      const n=8, rot=Array.from({length:n}, (_,i)=>i), rounds=[];
+      for(let r=0; r<n-1; r++){
+        const games=[];
+        for(let i=0; i<n/2; i++){
+          let a=rot[i], b=rot[n-1-i];
+          if((r+i)%2) [a,b]=[b,a];
+          games.push({id:`r${r}m${i}`, home:a, away:b});
+        }
+        rounds.push(games);
+        rot.splice(1,0,rot.pop());
+      }
+      return rounds;
+    }
+    const fixtures = makeFixtures();
+
+    /* Crypto helpers (PBKDF2) */
+    async function sha256Hex(text){
+      const enc=new TextEncoder();
+      const d=await crypto.subtle.digest("SHA-256", enc.encode(text));
+      return Array.from(new Uint8Array(d)).map(b=>b.toString(16).padStart(2,"0")).join("");
+    }
+    function toBase64(u8){ return btoa(String.fromCharCode(...u8)); }
+    function fromBase64(b64){ return Uint8Array.from(atob(b64), c => c.charCodeAt(0)); }
+    function randBytes(n){ const a=new Uint8Array(n); crypto.getRandomValues(a); return a; }
+    async function deriveKeyHex(password, saltUint8, iterations=150000){
+      const enc=new TextEncoder();
+      const keyMat = await crypto.subtle.importKey("raw", enc.encode(password), {name:"PBKDF2"}, false, ["deriveBits"]);
+      const derived = await crypto.subtle.deriveBits({name:"PBKDF2", salt:saltUint8, iterations, hash:"SHA-256"}, keyMat, 256);
+      return await sha256Hex(toBase64(new Uint8Array(derived)));
+    }
+
+    async function createDefaultAdminIfMissing(){
+      if(localStorage.getItem(KEYS.ADMIN)) return;
+      const pw = "NIGHTWING1361";
+      const salt = randBytes(16), iter = 150000;
+      const keyHex = await deriveKeyHex(pw, salt, iter);
+      localStorage.setItem(KEYS.ADMIN, JSON.stringify({ salt: toBase64(salt), iter, keyHex }));
+    }
+    async function verifyAdminPassword(password){
+      const raw = localStorage.getItem(KEYS.ADMIN); if(!raw) return false;
+      try{ const obj = JSON.parse(raw); const salt = fromBase64(obj.salt); const derived = await deriveKeyHex(password, salt, obj.iter); return derived === obj.keyHex }catch{ return false }
+    }
+    async function changeAdminPassword(currentPw, newPw){
+      const ok = await verifyAdminPassword(currentPw); if(!ok) throw new Error("Current password incorrect.");
+      const salt=randBytes(16), iter=150000; const keyHex = await deriveKeyHex(newPw, salt, iter);
+      localStorage.setItem(KEYS.ADMIN, JSON.stringify({ salt: toBase64(salt), iter, keyHex }));
+      createSession();
+    }
+    function createSession(){ localStorage.setItem(KEYS.SESSION, JSON.stringify({ expires: Date.now() + 30*60*1000 })); }
+    function clearSession(){ localStorage.removeItem(KEYS.SESSION); }
+    function adminLoggedIn(){ try{ const s = JSON.parse(localStorage.getItem(KEYS.SESSION) || "null"); return !!(s && s.expires && Date.now() < s.expires); }catch{ return false } }
+
+    /* UI helpers */
+    function escapeHtml(str){ return String(str).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c])); }
+    function badgeHTML(idx, small=false){
+      const cls = small ? "mini-badge" : "badge";
+      if(badges[idx]) return `<span class="${cls}"><img src="${badges[idx]}" alt="${teams[idx].name}"></span>`;
+      return `<span class="${cls}">${teams[idx].short}</span>`;
+    }
+
+    /* Renderers */
+    function renderTeams(){
+      const editable = adminLoggedIn();
+      const grid = $("#teamGrid");
+      if(!grid) return;
+      grid.innerHTML = teams.map((team, idx) => {
+        const upload = editable
+          ? `<label class="upload" for="badge-${idx}">＋ Upload badge<input id="badge-${idx}" type="file" accept="image/*" data-badge="${idx}"></label>`
+          : `<div class="small-muted" style="margin-top:8px">Badge upload disabled</div>`;
+        return `
+          <article class="team-card">
+            <div class="team-top">
+              <span class="small-muted">TEAM ${String(idx+1).padStart(2,"0")}</span>
+              ${badgeHTML(idx)}
+            </div>
+            <div style="margin-top:12px;font-weight:800">${escapeHtml(team.name)}</div>
+            ${upload}
+          </article>
+        `;
+      }).join("");
+
+      if(editable){
+        $all("[data-badge]").forEach(input => input.addEventListener("change", e => {
+          const file = e.target.files && e.target.files[0];
+          if(!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            badges[e.target.dataset.badge] = reader.result;
+            saveState(KEYS.BADGES, badges);
+            renderTeams();
+            renderMatches();
+            renderStandings();
+            renderBadgeList();
+          };
+          reader.readAsDataURL(file);
+        }));
+      }
+    }
+
+    function renderBadgeList(){
+      const el = $("#badgeList"); if(!el) return;
+      let html = "";
+      teams.forEach((team, idx) => {
+        html += `<div class="row"><span>${escapeHtml(team.name)}</span><span>${badges[idx] ? `<button class="btn ghost small" data-remove-badge="${idx}" type="button">Remove</button>` : "—"}</span></div>`;
+      });
+      el.innerHTML = html;
+      $all("[data-remove-badge]").forEach(btn => btn.addEventListener("click", ()=>{
+        const idx = btn.dataset.removeBadge;
+        if(confirm(`Remove badge for ${teams[idx].name}?`)){
+          delete badges[idx];
+          saveState(KEYS.BADGES, badges);
+          renderTeams(); renderMatches(); renderStandings(); renderBadgeList();
+        }
+      }));
+    }
+
+    function renderTabs(){
+      const tabs = $("#roundTabs"); if(!tabs) return;
+      tabs.innerHTML = fixtures.map((_, idx) => `<button class="btn small ${idx===activeRound ? "" : "ghost"}" data-round="${idx}" type="button">MD ${String(idx+1).padStart(2,"0")}</button>`).join("");
+    }
+
+    function renderMatches(){
+      const editable = adminLoggedIn();
+      const games = fixtures[activeRound];
+      const container = $("#matches"); if(!container) return;
+      const html = games.map(g => {
+        const score = scores[g.id] || {h:"", a:""};
+        const done = score.h !== "" && score.a !== "";
+        const inputHome = `<input inputmode="numeric" pattern="[0-9]*" type="number" min="0" max="99" value="${escapeHtml(score.h)}" data-score="${g.id}:h" ${editable ? "" : "disabled"} aria-label="${escapeHtml(teams[g.home].name)} goals">`;
+        const inputAway = `<input inputmode="numeric" pattern="[0-9]*" type="number" min="0" max="99" value="${escapeHtml(score.a)}" data-score="${g.id}:a" ${editable ? "" : "disabled"} aria-label="${escapeHtml(teams[g.away].name)} goals">`;
+        return `
+          <div class="match" data-game="${g.id}">
+            <div class="club">${badgeHTML(g.home, true)} <div class="club-name">${escapeHtml(teams[g.home].name)}</div></div>
+            <div class="score">${inputHome}<span>:</span>${inputAway}</div>
+            <div class="club away"><div class="club-name">${escapeHtml(teams[g.away].name)}</div> ${badgeHTML(g.away, true)}</div>
+            <div class="status" style="grid-column:1/-1">${done ? "✓ RESULT SAVED" : "UPCOMING MATCH"}</div>
+          </div>`;
+      }).join("");
+      container.innerHTML = html;
+    }
+
+    function attachMatchDelegation(){
+      const matchesEl = $("#matches");
+      if(!matchesEl) return;
+      matchesEl.addEventListener("change", (e) => {
+        const target = e.target;
+        if(!target || !target.dataset || !target.dataset.score) return;
+        const [id, side] = target.dataset.score.split(":");
+        if(!adminLoggedIn()){
+          target.value = scores[id] ? (scores[id][side] ?? "") : "";
+          alert("Admin only.");
+          return;
+        }
+        let v = String(target.value).trim();
+        if(v !== "" && (!Number.isInteger(Number(v)) || Number(v) < 0 || Number(v) > 99)){ target.value = ""; v = ""; }
+        scores[id] = scores[id] || {h:"", a:""};
+        scores[id][side] = v;
+        if(scores[id].h === "" && scores[id].a === "") delete scores[id];
+        saveState(KEYS.SCORES, scores);
+        renderMatches();
+        renderStandings();
+      });
+    }
+
+    /* Table calc */
+    function calcTable(){
+      const table = teams.map((team, idx) => ({ idx, name: team.name, P:0,W:0,D:0,L:0,GF:0,GA:0,GD:0,PTS:0 }));
+      fixtures.flat().forEach(g=>{
+        const s = scores[g.id];
+        if(!s || s.h === "" || s.a === "") return;
+        const h = Number(s.h), a = Number(s.a), home = table[g.home], away = table[g.away];
+        home.P++; away.P++;
+        home.GF += h; home.GA += a; away.GF += a; away.GA += h;
+        if(h > a){ home.W++; away.L++; home.PTS += 3; } else if(h < a){ away.W++; home.L++; away.PTS += 3; } else { home.D++; away.D++; home.PTS++; away.PTS++; }
+      });
+      table.forEach(r => r.GD = r.GF - r.GA);
+      table.sort((a,b) => b.PTS - a.PTS || b.GD - a.GD || b.GF - a.GF || b.W - a.W || a.name.localeCompare(b.name));
+      return table;
+    }
+
+    /* Champion controls */
+    function showChampionSection(){ const s=$("#champion"); if(s){ s.classList.remove("hidden"); s.setAttribute("aria-hidden","false"); } }
+    function hideChampionSection(){ const s=$("#champion"); if(s){ s.classList.add("hidden"); s.setAttribute("aria-hidden","true"); } }
+    function crownWinner(){
+      const rows = calcTable();
+      const allFinished = fixtures.flat().every(g => { const s = scores[g.id]; return s && s.h !== "" && s.a !== ""; });
+      if(!allFinished) return false;
+      const top = rows[0];
+      const nameEl = $("#championName"), metaEl = $("#championMeta");
+      if(nameEl && metaEl){ nameEl.textContent = top.name; metaEl.textContent = `${top.PTS} points • GD ${top.GD>0?"+":""}${top.GD} • ${top.GF} GF • League finished`; showChampionSection(); return true; }
+      return false;
+    }
+
+    function renderStandings(){
+      const rows = calcTable();
+      const tbody = $("#standings");
+      if(!tbody) return;
+      tbody.innerHTML = rows.map((r,i)=>`
+        <tr class="${i===0 ? "champion-row" : ""}">
+          <td class="rank">${i+1}</td>
+          <td>${escapeHtml(r.name)}</td>
+          <td>${r.P}</td>
+          <td>${r.W}</td>
+          <td>${r.D}</td>
+          <td>${r.L}</td>
+          <td>${r.GF}</td>
+          <td>${r.GA}</td>
+          <td>${r.GD>0?"+":""}${r.GD}</td>
+          <td>${r.PTS}</td>
+        </tr>
+      `).join("");
+      const allFinished = fixtures.flat().every(g => { const s = scores[g.id]; return s && s.h !== "" && s.a !== ""; });
+      if(allFinished) crownWinner(); else hideChampionSection();
+    }
+
+    /* Controls and event setup (safe checks) */
+    const dash = $("#adminDash"), openAdmin = $("#openAdmin"), closeDash = $("#closeDash");
+    const loginPanel = $("#loginPanel"), managePanel = $("#managePanel"), statusText = $("#statusText");
+    const loginInput = $("#loginInput"), loginBtn = $("#loginBtn"), logoutBtn = $("#logoutBtn");
+    const resetAllBtn = $("#resetAll"), clearBadgesBtn = $("#clearBadges"), resetScoresBtn = $("#resetScores");
+    const currentPwInput = $("#currentPw"), newPwInput = $("#newPw"), changePwBtn = $("#changePwBtn");
+    const exportJsonBtn = $("#exportJson"), exportCsvBtn = $("#exportCsv"), importJsonInput = $("#importJson");
+    const menuToggle = $("#menuToggle"), mainNav = $("#mainNav"), roundTabs = $("#roundTabs");
+
+    function setDashboardState(){
+      const logged = adminLoggedIn();
+      if(!loginPanel || !managePanel || !statusText) return;
+      if(logged){ loginPanel.classList.add("hidden"); managePanel.classList.remove("hidden"); statusText.textContent = "Logged in as admin"; }
+      else { loginPanel.classList.remove("hidden"); managePanel.classList.add("hidden"); statusText.textContent = "Not logged in"; }
+      renderBadgeList();
+    }
+
+    if(openAdmin) safeAddListener(openAdmin, "click", () => { setDashboardState(); if(dash) dash.classList.add("open"); if(dash) dash.setAttribute("aria-hidden","false"); });
+    if(closeDash) safeAddListener(closeDash, "click", () => { if(dash) dash.classList.remove("open"); if(dash) dash.setAttribute("aria-hidden","true"); });
+
+    if(loginBtn) safeAddListener(loginBtn, "click", async () => {
+      const pw = loginInput ? loginInput.value || "" : "";
+      if(!pw){ alert("Enter password."); return; }
+      const ok = await verifyAdminPassword(pw);
+      if(!ok){ alert("Incorrect password."); return; }
+      createSession();
+      if(loginInput) loginInput.value = "";
+      setDashboardState();
+      renderTeams(); renderMatches(); renderStandings();
+      if(dash) dash.classList.add("open");
+    });
+
+    if(logoutBtn) safeAddListener(logoutBtn, "click", () => { clearSession(); setDashboardState(); renderTeams(); renderMatches(); renderStandings(); if(dash) dash.classList.remove("open"); });
+
+    if(changePwBtn) safeAddListener(changePwBtn, "click", async () => {
+      const current = currentPwInput ? currentPwInput.value || "" : "";
+      const next = newPwInput ? newPwInput.value || "" : "";
+      if(!current || next.length < 4){ alert("Provide current password and a new password of at least 4 chars."); return; }
+      try{ await changeAdminPassword(current, next); if(currentPwInput) currentPwInput.value=""; if(newPwInput) newPwInput.value=""; alert("Password changed."); setDashboardState(); }catch(e){ alert(e.message); }
+    });
+
+    if(resetScoresBtn) safeAddListener(resetScoresBtn, "click", () => { if(!adminLoggedIn()){ alert("Admin only."); return; } if(confirm("Reset all match scores?")){ scores = {}; saveState(KEYS.SCORES, scores); renderMatches(); renderStandings(); } });
+    if(clearBadgesBtn) safeAddListener(clearBadgesBtn, "click", () => { if(!adminLoggedIn()){ alert("Admin only."); return; } if(confirm("Remove all team badges?")){ badges = {}; saveState(KEYS.BADGES, badges); renderTeams(); renderMatches(); renderStandings(); renderBadgeList(); } });
+    if(resetAllBtn) safeAddListener(resetAllBtn, "click", () => { if(!adminLoggedIn()){ alert("Admin only."); return; } if(confirm("Reset all local league data?")){ scores={}; badges={}; saveState(KEYS.SCORES, scores); saveState(KEYS.BADGES, badges); renderTeams(); renderMatches(); renderStandings(); renderBadgeList(); } });
+
+    if(exportJsonBtn) safeAddListener(exportJsonBtn, "click", () => {
+      if(!adminLoggedIn()){ alert("Admin only."); return; }
+      const payload = { teams, scores, badges };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url; a.download = "elite-eight-v6.json"; a.click(); URL.revokeObjectURL(url);
+    });
+
+    if(exportCsvBtn) safeAddListener(exportCsvBtn, "click", () => {
+      if(!adminLoggedIn()){ alert("Admin only."); return; }
+      const rows = calcTable();
+      let csv = "pos,team,p,w,d,l,gf,ga,gd,pts\n";
+      rows.forEach((r,i) => csv += `${i+1},"${r.name.replace(/"/g,'""')}",${r.P},${r.W},${r.D},${r.L},${r.GF},${r.GA},${r.GD},${r.PTS}\n`);
+      const blob = new Blob([csv], {type:"text/csv"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url; a.download = "elite-eight-standings.csv"; a.click(); URL.revokeObjectURL(url);
+    });
+
+    if(importJsonInput) safeAddListener(importJsonInput, "change", (e) => {
+      if(!adminLoggedIn()){ alert("Admin only."); return; }
+      const file = e.target.files && e.target.files[0]; if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{ const obj = JSON.parse(reader.result); if(obj.scores) scores = obj.scores; if(obj.badges) badges = obj.badges; saveState(KEYS.SCORES, scores); saveState(KEYS.BADGES, badges); renderTeams(); renderMatches(); renderStandings(); renderBadgeList(); alert("Import complete."); }catch{ alert("Invalid JSON file."); }
+      };
+      reader.readAsText(file);
+    });
+
+    if(menuToggle && mainNav) safeAddListener(menuToggle, "click", () => {
+      const open = mainNav.classList.toggle("mobile-open");
+      menuToggle.setAttribute("aria-expanded", String(open));
+    });
+
+    $all("#mainNav a").forEach(a => a.addEventListener("click", () => { if(window.matchMedia("(max-width:600px)").matches && mainNav){ mainNav.classList.remove("mobile-open"); menuToggle && menuToggle.setAttribute("aria-expanded","false"); } }));
+
+    document.addEventListener("click", (e) => {
+      if(window.matchMedia("(max-width:600px)").matches && mainNav){
+        if(!e.target.closest("#mainNav") && !e.target.closest("#menuToggle")){ mainNav.classList.remove("mobile-open"); menuToggle && menuToggle.setAttribute("aria-expanded","false"); }
+      }
+    });
+
+    if(roundTabs){
+      roundTabs.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-round]");
+        if(!btn) return;
+        activeRound = Number(btn.dataset.round);
+        renderMatches();
+        renderTabs();
+      });
+    }
+
+    attachMatchDelegation();
+
+    window.crownWinner = crownWinner;
+
+    (async function init(){
+      await createDefaultAdminIfMissing();
+      renderTeams();
+      renderTabs();
+      renderMatches();
+      renderStandings();
+      renderBadgeList();
+      setDashboardState();
+      attachMatchDelegation();
+    })();
+  </script>
+</body>
+</html>
