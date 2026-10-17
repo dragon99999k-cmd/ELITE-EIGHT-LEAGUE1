@@ -142,3 +142,99 @@ initVisualPolish();
 init();
 </script>
 </body></html>
+-- ELITE EIGHT LEAGUE — Supabase schema
+-- Run this entire file in Supabase Dashboard > SQL Editor.
+-- Then create your admin account in Authentication > Users and add its UUID using the instructions in README.md.
+
+create extension if not exists pgcrypto;
+
+create table if not exists public.teams (
+  id text primary key,
+  name text not null unique,
+  short text not null,
+  badge_url text,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.matches (
+  id text primary key,
+  round_number integer not null check (round_number between 1 and 7),
+  home_team_id text not null references public.teams(id) on delete restrict,
+  away_team_id text not null references public.teams(id) on delete restrict,
+  home_score integer check (home_score is null or home_score between 0 and 99),
+  away_score integer check (away_score is null or away_score between 0 and 99),
+  status text not null default 'scheduled' check (status in ('scheduled','live','finished','postponed')),
+  kickoff_at timestamptz,
+  venue text,
+  featured boolean not null default false,
+  created_at timestamptz not null default now(),
+  check (home_team_id <> away_team_id),
+  check ((home_score is null and away_score is null) or (home_score is not null and away_score is not null))
+);
+
+create table if not exists public.players (
+  id uuid primary key default gen_random_uuid(),
+  name text not null check (char_length(name) between 1 and 80),
+  team_id text not null references public.teams(id) on delete restrict,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.match_events (
+  id uuid primary key default gen_random_uuid(),
+  match_id text not null references public.matches(id) on delete cascade,
+  player_id uuid not null references public.players(id) on delete restrict,
+  event_type text not null check (event_type in ('goal')),
+  minute integer check (minute is null or minute between 1 and 130),
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.announcements (
+  id uuid primary key default gen_random_uuid(),
+  title text not null check (char_length(title) between 1 and 100),
+  body text not null check (char_length(body) between 1 and 1500),
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.season_archives (
+  id uuid primary key default gen_random_uuid(),
+  label text not null,
+  standings jsonb not null default '[]'::jsonb,
+  results jsonb not null default '[]'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+-- Only users whose auth UUID is listed here can change league data.
+create table if not exists public.league_admins (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+create or replace function public.is_league_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from public.league_admins where user_id = auth.uid());
+$$;
+revoke all on function public.is_league_admin() from public;
+grant execute on function public.is_league_admin() to anon, authenticated;
+
+alter table public.teams enable row level security;
+alter table public.matches enable row level security;
+alter table public.players enable row level security;
+alter table public.match_events enable row level security;
+alter table public.announcements enable row level security;
+alter table public.season_archives enable row level security;
+alter table public.league_admins enable row level security;
+
+-- Public read; admin-only writes.
+create policy "Public can read teams" on public.teams for select to anon, authenticated using (true);
+create policy "Admins manage teams" on public.teams for all to authenticated using (public.is_league_admin()) with check (public.is_league_admin());
+
+create policy "Public can read matches" on public.matches for select to anon, authenticated using (true);
+create policy "Admins manage matches" on public.matches for all to authenticated using (public.is_league_admin()) with check (public.is_league_admin());
+
+create policy "Public can read players" on public.players for select to anon, authenticated using (true);
+create policy "Admins manage players" on public.players for all to authenticated using (public.is_league_admin()) with check (public.is_league_admin());
