@@ -238,3 +238,6 @@ create policy "Admins manage matches" on public.matches for all to authenticated
 
 create policy "Public can read players" on public.players for select to anon, authenticated using (true);
 create policy "Admins manage players" on public.players for all to authenticated using (public.is_league_admin()) with check (public.is_league_admin());
+   NEXT_PUBLIC_SUPABASE_URL=https://uislzuoppsastrufdiaa.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_9c2s5aARmsglGQ_njfYw6A_dXLPnltZ
+   
